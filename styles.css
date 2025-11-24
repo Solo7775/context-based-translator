@@ -1,0 +1,156 @@
+#ai-translator-overlay {
+  position: absolute;
+  width: 300px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 2147483647;
+  /* Max z-index */
+  font-family: 'Segoe UI', sans-serif;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+  animation: ai-fade-in 0.2s ease-out;
+}
+
+@keyframes ai-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-translator-header {
+  background: #f8f9fa;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+  user-select: none;
+}
+
+.ai-translator-header span {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.ai-translator-logo {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.ai-translator-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  line-height: 1;
+}
+
+.ai-translator-close:hover {
+  color: #333;
+}
+
+.ai-translator-content {
+  padding: 15px;
+}
+
+
+
+.ai-translator-original-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.ai-translator-original {
+  font-size: 12px;
+  color: #7f8c8d;
+  font-style: italic;
+  border-left: 3px solid #ddd;
+  padding-left: 8px;
+  flex-grow: 1;
+  margin-bottom: 0;
+  /* Reset margin since wrapper handles it */
+}
+
+.ai-translator-play-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #3498db;
+  padding: 4px;
+  margin-left: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.ai-translator-play-btn:hover {
+  background-color: #eaf6ff;
+}
+
+.ai-translator-result {
+  font-size: 14px;
+  color: #2c3e50;
+  line-height: 1.5;
+}
+
+.ai-translator-result.loading {
+  color: #7f8c8d;
+  display: flex;
+  align-items: center;
+}
+
+.ai-translator-result.loading::after {
+  content: "...";
+  animation: ai-dots 1.5s infinite;
+}
+
+.ai-translator-result.error {
+  color: #c0392b;
+}
+
+.ai-translator-explanation {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  font-size: 13px;
+  color: #555;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 4px;
+  line-height: 1.4;
+}
+
+@keyframes ai-dots {
+
+  0%,
+  20% {
+    content: ".";
+  }
+
+  40% {
+    content: "..";
+  }
+
+  60%,
+  100% {
+    content: "...";
+  }
+}
