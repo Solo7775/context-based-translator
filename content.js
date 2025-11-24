@@ -29,7 +29,7 @@ if (window.aiTranslatorContentScriptLoaded) {
         } else if (request.action === "show_loading") {
             showOverlay(request.text, "Analyzing and Translating...", true);
         } else if (request.action === "show_result") {
-            updateOverlay(request.translated, request.explanation, false);
+            updateOverlay(request.translated, request.explanation, false, false, request.detectedLanguage);
         } else if (request.action === "show_error") {
             updateOverlay(`Error: ${request.error}`, null, false, true);
         }
@@ -104,9 +104,12 @@ if (window.aiTranslatorContentScriptLoaded) {
         playBtn.onclick = (e) => {
             e.stopPropagation();
             const utterance = new SpeechSynthesisUtterance(originalText);
-            utterance.lang = 'en-US';
+            utterance.lang = container.dataset.lang || 'en-US';
             window.speechSynthesis.speak(utterance);
         };
+
+        // Set initial language fallback
+        container.dataset.lang = document.documentElement.lang || navigator.language || 'en-US';
 
         // Position near selection
         const selection = window.getSelection();
@@ -128,12 +131,16 @@ if (window.aiTranslatorContentScriptLoaded) {
         }
     }
 
-    function updateOverlay(text, explanation, isLoading, isError = false) {
+    function updateOverlay(text, explanation, isLoading, isError = false, detectedLanguage = null) {
         if (!overlay) return;
 
         const content = overlay.querySelector('.ai-translator-result');
         content.textContent = text;
         content.className = `ai-translator-result ${isLoading ? 'loading' : ''} ${isError ? 'error' : ''}`;
+
+        if (detectedLanguage) {
+            overlay.dataset.lang = detectedLanguage;
+        }
 
         // Handle explanation
         let explanationEl = overlay.querySelector('.ai-translator-explanation');

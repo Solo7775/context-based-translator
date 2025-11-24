@@ -40,7 +40,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                 action: "show_result",
                 original: selectedText,
                 translated: result.translation,
-                explanation: result.explanation
+                explanation: result.explanation,
+                detectedLanguage: result.detected_language
             });
         } catch (error) {
             console.error("Translation flow error:", error);
@@ -82,24 +83,27 @@ async function sendMessageToTab(tabId, message) {
 }
 
 async function translateWithContext(text, context, url) {
-    // Get API key and target language
-    const data = await chrome.storage.local.get(['openaiApiKey', 'targetLanguage']);
-    const apiKey = data.openaiApiKey;
+    // Get API key, target language, and model
+    const data = await chrome.storage.local.get(['openRouterApiKey', 'targetLanguage', 'openRouterModel']);
+    const apiKey = data.openRouterApiKey;
     const targetLang = data.targetLanguage || 'English';
+    const model = data.openRouterModel || 'openai/gpt-3.5-turbo';
 
     if (!apiKey) {
-        throw new Error("Please set your OpenAI API Key in the extension settings.");
+        throw new Error("Please set your OpenRouter API Key in the extension settings.");
     }
 
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Authorization': `Bearer ${apiKey}`,
+                'HTTP-Referer': 'https://github.com/Solo7775/context-based-translator', // Optional but good practice
+                'X-Title': 'AI Translator'
             },
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
+                model: model,
                 messages: [
                     {
                         role: "system",
@@ -108,11 +112,13 @@ async function translateWithContext(text, context, url) {
 2. Translate the user's text into ${targetLang} based on this context.
    - CRITICAL: The "translation" field MUST be in ${targetLang}.
    - If the source text is already in ${targetLang}, return it as is or slightly polished, but DO NOT translate it to English.
-3. Provide a simple, beginner-friendly explanation of the original text, referencing the website context if relevant.
+3. Provide a simple, beginner-friendly explanation of the original text, referencing the website context if relevant. The explanation MUST be in ${targetLang}.
+4. Detect the language of the original text and return its ISO 639-1 code (e.g., "en", "es", "fr", "ja") as "detected_language".
 
-Return the result as a JSON object with keys: "translation" and "explanation".
+Return the result as a JSON object with keys: "translation", "explanation", and "detected_language".
 "translation": The translated text in ${targetLang}.
-"explanation": The explanation in English (or the language of the original text if not English).`
+"explanation": The explanation in ${targetLang}.
+"detected_language": The ISO 639-1 code of the original text.`
                     },
                     {
                         role: "user",
