@@ -196,6 +196,12 @@ While there are no default shortcuts, you can set them up:
 
 ---
 
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
 ## 🙏 Acknowledgments
 
 - Powered by [OpenRouter](https://openrouter.ai)
