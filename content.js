@@ -4,6 +4,80 @@ if (window.aiTranslatorContentScriptLoaded) {
     window.aiTranslatorContentScriptLoaded = true;
 
     let overlay = null;
+    let floatingIcon = null;
+
+    // Listen for mouse events for floating icon
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousedown', handleMouseDown);
+
+    function handleMouseUp(e) {
+        // Wait a bit to ensure selection is complete
+        setTimeout(() => {
+            const selection = window.getSelection();
+            const text = selection.toString().trim();
+
+            if (text.length > 0 && text.length < 2000) { // Reasonable limits
+                // Check if selection is inside our own overlay
+                if (overlay && overlay.contains(selection.anchorNode)) return;
+
+                showFloatingIcon(selection);
+            } else {
+                hideFloatingIcon();
+            }
+        }, 10);
+    }
+
+    function handleMouseDown(e) {
+        if (floatingIcon && !floatingIcon.contains(e.target)) {
+            hideFloatingIcon();
+        }
+    }
+
+    function showFloatingIcon(selection) {
+        if (floatingIcon) hideFloatingIcon();
+
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+
+        // Create icon
+        floatingIcon = document.createElement('div');
+        floatingIcon.className = 'ai-translator-floating-icon';
+
+        const img = document.createElement('img');
+        img.src = chrome.runtime.getURL('icons/icon48.png');
+        floatingIcon.appendChild(img);
+
+        // Position icon (top-right of selection)
+        const top = rect.top + window.scrollY - 40; // Above selection
+        const left = rect.right + window.scrollX - 10;
+
+        floatingIcon.style.top = `${top}px`;
+        floatingIcon.style.left = `${left}px`;
+
+        // Add click listener
+        floatingIcon.onclick = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            const text = selection.toString().trim();
+
+            // Send message to background to translate
+            chrome.runtime.sendMessage({
+                action: "translate_text",
+                text: text
+            });
+
+            hideFloatingIcon();
+        };
+
+        document.body.appendChild(floatingIcon);
+    }
+
+    function hideFloatingIcon() {
+        if (floatingIcon) {
+            floatingIcon.remove();
+            floatingIcon = null;
+        }
+    }
 
     // Listen for messages from background script
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

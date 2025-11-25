@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2025-11-25
+
+### Added
+- **Floating Icon**: Automatically show a floating icon when text is selected to trigger translation.
+
 ## [1.2.0] - 2025-11-24
 
 ### Added

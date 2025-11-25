@@ -154,3 +154,42 @@
     content: "...";
   }
 }
+
+.ai-translator-floating-icon {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 2147483647;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e0e0e0;
+  transition: transform 0.2s, opacity 0.2s;
+  animation: ai-pop-in 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ai-translator-floating-icon:hover {
+  transform: scale(1.1);
+  background-color: #f8f9fa;
+}
+
+.ai-translator-floating-icon img {
+  width: 20px;
+  height: 20px;
+}
+
+@keyframes ai-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

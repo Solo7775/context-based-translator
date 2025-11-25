@@ -12,51 +12,61 @@ chrome.runtime.onInstalled.addListener(() => {
 // Handle context menu click
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId === "translate-selection") {
-        const selectedText = info.selectionText;
-
-        try {
-            // Send message to content script to show loading state
-            await sendMessageToTab(tab.id, {
-                action: "show_loading",
-                text: selectedText
-            });
-
-            // Get context from content script
-            let context = "";
-            let url = "";
-            try {
-                const response = await chrome.tabs.sendMessage(tab.id, { action: "get_context" });
-                if (response) {
-                    context = response.context || "";
-                    url = response.url || "";
-                }
-            } catch (e) {
-                console.warn("Could not get context:", e);
-            }
-
-            const result = await translateWithContext(selectedText, context, url);
-
-            await sendMessageToTab(tab.id, {
-                action: "show_result",
-                original: selectedText,
-                translated: result.translation,
-                explanation: result.explanation,
-                detectedLanguage: result.detected_language
-            });
-        } catch (error) {
-            console.error("Translation flow error:", error);
-            // Try to show error on page if possible
-            try {
-                await sendMessageToTab(tab.id, {
-                    action: "show_error",
-                    error: error.message
-                });
-            } catch (e) {
-                console.error("Could not show error on page:", e);
-            }
-        }
+        await handleTranslation(info.selectionText, tab);
     }
 });
+
+// Handle messages from content script
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "translate_text" && request.text) {
+        handleTranslation(request.text, sender.tab);
+    }
+    // Return true if you want to send a response asynchronously, though we aren't using sendResponse here for the main flow
+});
+
+async function handleTranslation(selectedText, tab) {
+    try {
+        // Send message to content script to show loading state
+        await sendMessageToTab(tab.id, {
+            action: "show_loading",
+            text: selectedText
+        });
+
+        // Get context from content script
+        let context = "";
+        let url = "";
+        try {
+            const response = await chrome.tabs.sendMessage(tab.id, { action: "get_context" });
+            if (response) {
+                context = response.context || "";
+                url = response.url || "";
+            }
+        } catch (e) {
+            console.warn("Could not get context:", e);
+        }
+
+        const result = await translateWithContext(selectedText, context, url);
+
+        await sendMessageToTab(tab.id, {
+            action: "show_result",
+            original: selectedText,
+            translated: result.translation,
+            explanation: result.explanation,
+            detectedLanguage: result.detected_language
+        });
+    } catch (error) {
+        console.error("Translation flow error:", error);
+        // Try to show error on page if possible
+        try {
+            await sendMessageToTab(tab.id, {
+                action: "show_error",
+                error: error.message
+            });
+        } catch (e) {
+            console.error("Could not show error on page:", e);
+        }
+    }
+}
 
 async function sendMessageToTab(tabId, message) {
     try {
