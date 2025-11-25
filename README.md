@@ -157,10 +157,10 @@ Your API key is **stored locally** in your browser. No data is sent to third par
 
 | Use Case | Recommended Model | Why? |
 |----------|-------------------|-------|
-| **Daily browsing** | `openai/gpt-3.5-turbo` | Fast and cost-effective |
+| **Daily browsing** | `openai/gpt-4o-mini` | Fast and cost-effective |
 | **Technical docs** | `openai/gpt-4o` | Better understanding of complex terms |
 | **Best quality** | `anthropic/claude-3-opus` | Most accurate translations |
-| **Free tier** | `google/gemini-pro:free` | No cost (limited usage) |
+| **Free tier** | `xAI/grok-4.1-fast(free)` | No cost (limited usage), best experience so far, for real!!! |
 
 ### Keyboard Shortcuts
 
